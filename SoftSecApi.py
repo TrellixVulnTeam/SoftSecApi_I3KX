@@ -4,7 +4,7 @@ from functools import wraps
 
 from flask import Flask, request, jsonify, _app_ctx_stack, Response
 from flask_cors import cross_origin
-from jose import jwt
+from jose import jwt, JWTError
 app = Flask(__name__)
 
 AUTH0_DOMAIN = 'jentonic.eu.auth0.com'
@@ -32,6 +32,12 @@ class AuthError(Exception):
         self.error = error
         self.status_code = status_code
 
+# @app.errorhandler(JWTError)
+# def handle_auth_error(ex):
+#     raise AuthError({"code": "invalid_header",
+#                "description":
+#                    "Unable to parse authentication"
+#                    " token."}, 401)
 
 @app.errorhandler(AuthError)
 def handle_auth_error(ex):
@@ -81,7 +87,13 @@ def requires_auth(f):
         token = get_token_auth_header()
         jsonurl = urlopen("https://" + AUTH0_DOMAIN + "/.well-known/jwks.json")
         jwks = json.loads(jsonurl.read())
-        unverified_header = jwt.get_unverified_header(token)
+        try:
+            unverified_header = jwt.get_unverified_header(token)
+        except(JWTError):
+            raise AuthError({"code": "invalid_header",
+                       "description":
+                           "Unable to parse authentication"
+                           " token."}, 401)
         rsa_key = {}
         for key in jwks["keys"]:
             if key["kid"] == unverified_header["kid"]:
