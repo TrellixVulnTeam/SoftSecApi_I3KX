@@ -8,7 +8,7 @@ from jose import jwt, JWTError
 app = Flask(__name__)
 
 AUTH0_DOMAIN = 'jentonic.eu.auth0.com'
-API_AUDIENCE = 'https://jentonic.eu.auth0.com/api/v2/'
+API_AUDIENCE = 'https://softsecapi.herokuapp.com/'
 ALGORITHMS = ["RS256"]
 
 APP = Flask(__name__)
